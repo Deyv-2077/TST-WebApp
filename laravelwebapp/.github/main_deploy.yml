@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Laravel app to Azure Web App - tstwebapp
+name: Build and deploy PHP app to Azure Web App - tstwebapp
 
 on:
   push:
@@ -29,12 +29,6 @@ jobs:
         with:
           files: 'composer.json'
 
-      - name: Install Dependencies
-        if: steps.check_files.outputs.files_exists == 'true'
-        run: |
-          php --version
-          composer config "http-basic.nova.laravel.com" "${{ secrets.NOVA_USER }}" "${{ secrets.NOVA_KEY }}"
-
       - name: Run composer install if composer.json exists
         if: steps.check_files.outputs.files_exists == 'true'
         run: composer validate --no-check-publish && composer install --prefer-dist --no-progress
@@ -54,7 +48,10 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
@@ -67,9 +64,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_877076320FA7483A86634E827804C85D }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_3ED5DD925E064BCD93A9C99225CA6A57 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7763A9D49E6D40989DCF75C09032C289 }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -78,13 +75,4 @@ jobs:
           app-name: 'tstwebapp'
           slot-name: 'Production'
           package: .
-
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
-        with:
-          app-name: 'tstwebapp'
-          slot-name: 'Production'
-          package: .
-          #publish-profile: ${{ secrets.AzureAppService_PublishProfile}}
-          #_724257327e004c19ab4ff83431a83099 # This is the name of the Azure App Service Publish Profile secret
+          
