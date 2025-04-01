@@ -19,5 +19,5 @@ Route::get('/', function () {
 });
 
 
-Route::get('/test', [TestController::class, 'showTestPage']);
+/* Route::get('/test', [TestController::class, 'showTestPage']); */
 
