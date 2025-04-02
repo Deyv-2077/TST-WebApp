@@ -9,6 +9,6 @@ class TestController extends Controller
     public function showTestPage()
     {
         // Retorna a view "test"
-        return view();
+        return view('/');
     }
 }
